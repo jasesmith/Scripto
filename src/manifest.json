@@ -1,0 +1,14 @@
+{
+  "manifest_version": 2,
+  "name": "Scripto",
+  "description": "Write (and actually use) notes",
+  "version": "1.0",
+  "browser_action": { },
+  "chrome_url_overrides" : {
+    "newtab": "index.html"
+  },
+  "permissions": [
+    "activeTab",
+    "storage"
+  ]
+}

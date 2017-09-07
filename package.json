@@ -1,0 +1,44 @@
+{
+  "name": "Scripto",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Jase <jase@star29.com>",
+  "license": "MIT",
+  "scripts": {
+    "watch": "rimraf dist && webpack --progress --colors --watch",
+    "start": "npm run watch"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-es2015": "^6.24.1",
+    "css-loader": "^0.28.7",
+    "eslint": "^3.19.0",
+    "eslint-config-airbnb": "^15.1.0",
+    "eslint-config-airbnb-base": "^11.1.3",
+    "eslint-friendly-formatter": "^3.0.0",
+    "eslint-import-resolver-webpack": "^0.8.1",
+    "eslint-loader": "^1.7.1",
+    "eslint-plugin-html": "^3.2.1",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-vue": "^2.1.0",
+    "file-loader": "^0.11.2",
+    "font-awesome": "^4.7.0",
+    "html-webpack-plugin": "^2.30.1",
+    "moment": "^2.18.1",
+    "node-sass": "^4.5.3",
+    "pug": "^2.0.0-rc.3",
+    "rimraf": "^2.6.1",
+    "sass-loader": "^6.0.5",
+    "style-loader": "^0.18.2",
+    "vue-loader": "^13.0.4",
+    "vue-template-compiler": "^2.4.2",
+    "webpack": "^3.5.5"
+  },
+  "dependencies": {
+    "babel-eslint": "^7.2.3",
+    "normalize.css": "^7.0.0",
+    "simplemde": "^1.11.2",
+    "vue": "^2.4.2"
+  }
+}
