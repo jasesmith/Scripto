@@ -6,6 +6,7 @@
 
 <script>
   import SimpleMDE from 'simplemde'
+  import marked from 'marked'
 
   require('simplemde/dist/simplemde.min.css')
 
@@ -36,11 +37,21 @@
       initialValue: val,
       spellChecker: true,
       placeholder: "Type here...",
-      toolbar: false,
+      // toolbar: true,
       toolbarTips: false,
-      status: false,
-      autoDownloadFontAwesome: false,
-      forceSync: true
+      status: ["autosave", "lines", "words", "cursor"],
+      autoDownloadFontAwesome: true,
+      forceSync: true,
+      previewRender: function(plainText, preview) { // Async method
+        setTimeout(function(){
+          preview.innerHTML = marked(plainText);
+        }, 250);
+        return "Loading...";
+      },
+      renderingConfig: {
+        singleLineBreaks: false,
+        codeSyntaxHighlighting: true,
+      },
     })
   }
 </script>

@@ -10,7 +10,7 @@ $fa-font-path: "~font-awesome/fonts";
   flex-direction: row-reverse;
   color: unquote('rgb(var(--base))');
   background: #fff;
-  font-size: calc(.6vw + .6vh + .3vmin);
+  font-size: calc(.5vw + .5vh + .2vmin);
 }
 /*.notes * {
   box-shadow: 0 0 0 1px red;
@@ -81,13 +81,13 @@ button {
 
 
 input.note-title {
-  font-size: 1em;
+  font-size: 1.3em;
   border: 0;
   border-radius: 0;
   border-bottom: 2px solid;
   margin: 0;
   line-height: 1.5;
-  padding: 1em 0;
+  padding: .5em 0;
   color: inherit;
 }
 .note-area {
@@ -106,10 +106,17 @@ input.note-title {
   background: transparent;
   pre {
     padding: .5em 0;
+    line-height: 1;
   }
 }
 .cm-header, .cm-strong {
   font-weight: 300
+}
+
+.editor-toolbar {
+  border: 0;
+  background: rgba(150,150,150,.15);
+  border-radius: 0 0 .2em .2em;
 }
 
 .fade-enter-active, .fade-leave-active {
