@@ -1,0 +1,45 @@
+#👻 {
+  border: 0;
+  font-size: .85em;
+  padding: 2em 1em;
+  width: 35vw;
+  min-width: 15em;
+  max-width: 100vw;
+  top: 0%;
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  opacity: 0;
+  transform: translate(-50%, -100%);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 0.5em 1em -0.5em rgba(25,25,25, .5);
+  border-bottom: .5em solid;
+  color: #ca1e34;
+  &::backdrop {
+    background: rgba(230,230,230, .5);
+  }
+  &[open] {
+    animation: show-dialog 300ms ease-out forwards;
+  }
+  &.hide {
+    animation: hide-dialog 200ms ease-out forwards;
+  }
+}
+@keyframes show-dialog {
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0%);
+  }
+}
+@keyframes hide-dialog {
+  from {
+    opacity: 1;
+    transform: translate(-50%, 0%);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -100%);
+  }
+}
