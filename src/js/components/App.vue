@@ -6,9 +6,12 @@
       </symbol>
     </svg>
     <aside class="sidebar">
+      <header>
+        <input placeholder="find..." class="note-filter" type="search" v-model="filter" />
+      </header>
       <transition-group name="flip-list" tag="ul">
-        <li v-for="note in notes" :key="note.id" :class="{ active: note === selected }" @click="selectNote(note)">
-          <h4 class="note-title">
+        <li v-for="note in foundNotes" :key="note.id" :class="{ active: note === selected }" @click="selectNote(note)">
+          <h4 class="note-name">
             <span>{{ note.title }}</span>
             <span class="x" @click.stop="tryDelete(note)" v-if="note === selected">
               <svg><use xlink:href="#x" /></svg>
@@ -18,14 +21,12 @@
         </li>
       </transition-group>
       <footer>
-        <div @click="createNote"><i class="fa fa-plus fa-lg"></i></div>
+        <div @click="createNote"><i class="fa fa-plus fa-lg"></i> New Note</div>
       </footer>
     </aside>
 
     <main class="main">
-      <transition name="fade" appear mode="out-in">
-        <input v-if="selected" v-model="selected.title" :key="selected.id" type="text" placeholder="Title..." class="note-title" />
-      </transition>
+      <input v-if="selected" v-model="selected.title" :key="selected.id" type="text" placeholder="Title..." class="note-title" />
       <transition name="fade" appear mode="out-in">
         <editor v-if="selected" v-model="selected.body" :key="selected.id" placeholder="Notes..."></editor>
       </transition>
@@ -33,7 +34,7 @@
     <dialog id="👻">
       <header>Delete Note?</header>
       <footer>
-        <button @click="cancelDelete()">No</button>
+        <button @click="cancelDelete()" class="primary">No</button>
         <button @click="confirmDelete(selected)">Yes</button>
       </footer>
     </dialog>
@@ -49,16 +50,23 @@ const SKEY = "SCRIPTO"
 const DIALOG_ID = "👻"
 
 const component = {
-  data: () => {
+  data () {
     return {
       notes: [],
       selected: undefined,
       toolboxIsOpen: false,
       dialog: null,
-      isNewNote: false,
+      filter: '',
     }
   },
-  mounted: function() {
+  computed: {
+    foundNotes () {
+      return this.notes.filter(item => {
+        return `${item.title} ${item.body}`.toLowerCase().includes(this.filter.toLowerCase().trim())
+      })
+    },
+  },
+  mounted () {
     const vm = this
     this.dialog = document.getElementById(DIALOG_ID)
     loadNotes(this)

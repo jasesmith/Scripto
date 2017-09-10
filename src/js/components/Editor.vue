@@ -30,7 +30,7 @@
   function initEditor(el, val) {
     class MarkedCustomRenderer extends marked.Renderer {
       listitem(text) {
-        if (/^\s*\[[dbsx\/\! ]\]\s*/.test(text)) {
+        if (/^\s*\[[dbsx\/\!\# ]\]\s*/.test(text)) {
           text = text
           .replace(/^\s*\[ \]\s*/, '<i class="todo-undone fa fa-circle-o fa-fw"></i> ')
           .replace(/^\s*\[(x|d)\]\s*/, '<i class="todo-done fa fa-check-circle fa-fw"></i> ')
@@ -50,7 +50,8 @@
       initialValue: val,
       spellChecker: true,
       placeholder: "Type here...",
-      toolbarTips: false,
+      toolbarTips: true,
+      status: ["lines", "words", "cursor"],
       autoDownloadFontAwesome: true,
       forceSync: true,
       previewRender: function(plainText, preview) { // Async method
