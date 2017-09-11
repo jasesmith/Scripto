@@ -48,6 +48,7 @@ aside {
   }
   ul {
     flex: 0 1 auto;
+    min-height: 30em;
     list-style-type: none;
     overflow: auto;
     margin: 0;
@@ -60,14 +61,15 @@ aside {
     cursor: pointer;
     color: #818386;
     box-shadow: 0 2px 0 0 rgba(0,0,0,.15);
+    transition: 120ms ease-out;
     + li {
       margin: 2px 0 0 0;
     }
     &:hover {
       background: rgba(#fff, .05);
-      color: #fff;
+      color: #a1a3a6;
       .note-name {
-        color: inherit;
+        color: #c1c3c6;
       }
     }
     &.active {
@@ -88,6 +90,7 @@ aside {
     letter-spacing: -.15ch;
     word-spacing: .3ex;
     color: unquote('rgb(var(--accent))');
+    transition: 120ms ease-out;
     span {
       white-space: nowrap;
       text-overflow: ellipsis;
@@ -176,6 +179,8 @@ input.note-filter {
   display: flex;
   flex-direction: column;
   color: rgb(33,33,35);
+  min-height: 30em;
+  min-width: 35em;
 }
 
 .CodeMirror {
