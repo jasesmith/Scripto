@@ -26,9 +26,6 @@
           <div class="note-preview">{{ note.body }}</div>
         </li>
       </transition-group>
-      <!-- <footer>
-        <div @click="createNote"><i class="fa fa-plus fa-lg"></i> New Note</div>
-      </footer> -->
     </aside>
 
     <main class="main">
