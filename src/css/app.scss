@@ -9,9 +9,10 @@ $fa-font-path: "~font-awesome/fonts";
   --base: 255,153,0;
   --accent: 13,199,219;
   height: 100vh;
+  min-height: 30em;
   margin: 0;
   display: flex;
-  flex-direction: row; //-reverse;
+  flex-direction: row-reverse;
   color: unquote('rgb(var(--base))');
   background: #dfdfdf;
   font-size: calc(1vmin + .5em);
@@ -29,16 +30,31 @@ main {
   overflow: auto;
   transition: 350ms ease-out;
   box-shadow: 0 0 1.6em -.5em rgba(0,0,0,.6);
+  header {
+    flex: none;
+    display: flex;
+  }
 }
 aside {
   position: relative;
-  flex: none;
-  width: 20em;
+  flex: 1;
+  // width: 20em;
   display: flex;
   flex-direction: column;
   color: unquote('rgb(var(--base))');
   background: #313336;
   transition: 350ms ease-out;
+  header {
+    flex: none;
+    display: flex;
+    button {
+      border-width: 0 0 2px 0;
+      border-color: #313336;
+      border-radius: 0;
+      padding-left: 1em;
+      padding-right: 1em;
+    }
+  }
   footer {
     flex: none;
     display: flex;
@@ -48,7 +64,6 @@ aside {
   }
   ul {
     flex: 0 1 auto;
-    min-height: 30em;
     list-style-type: none;
     overflow: auto;
     margin: 0;
@@ -87,8 +102,8 @@ aside {
     margin: 0;
     font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: -.15ch;
-    word-spacing: .3ex;
+    letter-spacing: -.1ch;
+    word-spacing: .1ch;
     color: unquote('rgb(var(--accent))');
     transition: 120ms ease-out;
     span {
@@ -134,6 +149,7 @@ button {
   border: 1px solid rgba(0,0,0,.15);
   border-radius: .2em;
   outline: none;
+  white-space: nowrap;
   + button {
     margin-left: 1em;
   }

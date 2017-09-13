@@ -8,6 +8,12 @@
     <aside class="sidebar">
       <header>
         <input placeholder="find..." class="note-filter" type="search" v-model="filter" />
+        <button @click="createNote">
+          <span class="fa-stack fa-lg">
+            <i class="fa fa-sticky-note-o fa-stack-2x"></i>
+            <i class="fa fa-plus fa-stack-1x"></i>
+          </span>
+        </button>
       </header>
       <transition-group name="flip-list" tag="ul">
         <li v-for="note in foundNotes" :key="note.id" :class="{ active: note === selected }" @click="selectNote(note)">
@@ -20,13 +26,15 @@
           <div class="note-preview">{{ note.body }}</div>
         </li>
       </transition-group>
-      <footer>
+      <!-- <footer>
         <div @click="createNote"><i class="fa fa-plus fa-lg"></i> New Note</div>
-      </footer>
+      </footer> -->
     </aside>
 
     <main class="main">
-      <input v-if="selected" v-model="selected.title" :key="selected.id" type="text" placeholder="Title..." class="note-title" />
+      <header>
+        <input v-if="selected" v-model="selected.title" :key="selected.id" type="text" placeholder="Title..." class="note-title" />
+      </header>
       <transition name="fade" appear mode="out-in">
         <editor v-if="selected" v-model="selected.body" :key="selected.id" placeholder="Notes..."></editor>
       </transition>
