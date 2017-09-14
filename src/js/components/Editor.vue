@@ -32,36 +32,42 @@
       listitem(text) {
         if (/^\s*\[[dbsx\/\!\# ]\]\s*/.test(text)) {
           text = text
-          .replace(/^\s*\[ \]\s*/, '<i class="todo-undone fa fa-circle-o fa-fw"></i> ')
-          .replace(/^\s*\[(x|d)\]\s*/, '<i class="todo-done fa fa-check-circle fa-fw"></i> ')
-          .replace(/^\s*\[(\/|s)\]\s*/, '<i class="todo-started fa fa-play-circle fa-fw"></i> ')
-          .replace(/^\s*\[(!|b|#)\]\s*/, '<i class="todo-blocked fa fa-exclamation-circle fa-fw"></i> ')
-          return '<li class="todo-item" style="list-style: none">' + text + '</li>'
+          .replace(/^\s*\[ \]\s*/, '<i class="todo-icon todo-undone fa fa-circle-o fa-fw"></i> <div>')
+          .replace(/^\s*\[(x|d)\]\s*/, '<i class="todo-icon todo-done fa fa-check-circle fa-fw"></i> <div>')
+          .replace(/^\s*\[(\/|s)\]\s*/, '<i class="todo-icon todo-started fa fa-play-circle fa-fw"></i> <div>')
+          .replace(/^\s*\[(!|b|#)\]\s*/, '<i class="todo-icon todo-blocked fa fa-exclamation-circle fa-fw"></i> <div>')
+          return '<li class="todo-item">' + text + '</div></li>'
         } else {
           return '<li>' + text + '</li>'
         }
       }
     }
 
-    var renderer = new MarkedCustomRenderer()
 
     return new SimpleMDE({
       element: el,
       initialValue: val,
       spellChecker: true,
-      placeholder: "Type here...",
-      toolbarTips: true,
-      status: ["lines", "words", "cursor"],
+      blockStyles: {
+        bold: "**",
+        italic: "_"
+      },
+      placeholder: "write all the things...",
+      toolbar: ['bold', 'italic', 'strikethrough', 'heading', 'code', 'quote', 'unordered-list', 'ordered-list', 'link', 'image', 'horizontal-rule', 'preview'],
+      status: false, //["lines", "words", "cursor"],
       autoDownloadFontAwesome: true,
       forceSync: true,
       previewRender: function(plainText, preview) { // Async method
+        var renderer = new MarkedCustomRenderer()
         setTimeout(function(){
           preview.innerHTML = marked(plainText, {renderer});
-        }, 250);
-        return "Loading...";
+        }, 1);
+      },
+      shortcuts: {
+        'togglePreview': 'Cmd-S'
       },
       renderingConfig: {
-        singleLineBreaks: false,
+        singleLineBreaks: true,
         codeSyntaxHighlighting: true,
       },
     })

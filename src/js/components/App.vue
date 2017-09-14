@@ -8,10 +8,10 @@
     <aside class="sidebar">
       <header>
         <input placeholder="find..." class="note-filter" type="search" v-model="filter" />
-        <button @click="createNote">
-          <span class="fa-stack fa-lg">
-            <i class="fa fa-sticky-note-o fa-stack-2x"></i>
-            <i class="fa fa-plus fa-stack-1x"></i>
+        <button class="note-create" @click="createNote">
+          <span class="fa-stack">
+            <i class="fa fa-sticky-note fa-stack-2x"></i>
+            <i class="fa fa-plus fa-inverse fa-stack-1x" ></i>
           </span>
         </button>
       </header>
@@ -23,9 +23,15 @@
               <svg><use xlink:href="#x" /></svg>
             </span>
           </h4>
-          <div class="note-preview">{{ note.body }}</div>
+          <div class="note-preview" v-if="showPreview">{{ note.body }}</div>
+          <div class="note-preview" v-else>Saved {{ timeSince(note.lastEdit) }}</div>
         </li>
       </transition-group>
+      <!-- <footer>
+        <small @click="togglePreview">
+          <i class="fa" :class="previewIcon"></i>
+        </small>
+      </footer> -->
     </aside>
 
     <main class="main">
@@ -33,7 +39,7 @@
         <input v-if="selected" v-model="selected.title" :key="selected.id" type="text" placeholder="Title..." class="note-title" />
       </header>
       <transition name="fade" appear mode="out-in">
-        <editor v-if="selected" v-model="selected.body" :key="selected.id" placeholder="Notes..."></editor>
+        <editor v-if="selected" v-model="selected.body" :key="selected.id"></editor>
       </transition>
     </main>
     <dialog id="👻">
@@ -52,6 +58,7 @@ import moment from 'moment'
 
 const { chrome } = window
 const SKEY = "SCRIPTO"
+const SKEY_LAST = `${SKEY}_LAST`
 const DIALOG_ID = "👻"
 
 const component = {
@@ -59,7 +66,7 @@ const component = {
     return {
       notes: [],
       selected: undefined,
-      toolboxIsOpen: false,
+      showPreview: false,
       dialog: null,
       filter: '',
     }
@@ -70,6 +77,9 @@ const component = {
         return `${item.title} ${item.body}`.toLowerCase().includes(this.filter.toLowerCase().trim())
       })
     },
+    previewIcon () {
+      return (this.showPreview ? 'fa-compress':'fa-expand')
+    },
   },
   mounted () {
     const vm = this
@@ -77,13 +87,14 @@ const component = {
     loadNotes(this)
     vm.$watch(function() {
       if (!this.selected) return undefined;
-      return { id: this.selected.id, title: this.selected.title, body: this.selected.body };
+      return { id: this.selected.id, lastEdit: this.selected.lastEdit, title: this.selected.title, body: this.selected.body };
     }, function(val, prev) {
       if (!prev) return;
       if (val.id === prev.id && (val.title !== prev.title || val.body !== prev.body)) {
         const ind = vm.notes.findIndex((x) => x.id === val.id);
-        if (ind > 0) {
+        if (ind > -1) {
           const el = vm.notes[ind];
+          el.lastEdit = moment().format()
           vm.notes.splice(ind, 1);
           vm.notes = [el, ...vm.notes];
         }
@@ -94,7 +105,6 @@ const component = {
     });
   },
   methods: {
-    toggleTools,
     createNote,
     removeNote,
     tryDelete,
@@ -103,6 +113,8 @@ const component = {
     dismissDialog,
     selectNote,
     clearAllNotes,
+    togglePreview,
+    timeSince,
   },
 }
 
@@ -113,17 +125,25 @@ function selectNote(note) {
     return
   }
   this.selected = note
+  chrome.storage.sync.set({[SKEY_LAST]: note.id})
 }
 
-function toggleTools() {
-  this.toolboxIsOpen = !this.toolboxIsOpen
+function togglePreview() {
+  this.showPreview = !this.showPreview
+}
+
+function timeSince(timestamp) {
+  if(timestamp) {
+    return moment(timestamp).fromNow()
+  }
 }
 
 function createNote() {
   const note = {
     id: guid(),
+    lastEdit: moment().format(),
     title: moment().format('dddd LT, MMM D'),
-    body: ''
+    body: '',
   }
   this.notes.unshift(note)
   this.selectNote(note)
@@ -135,7 +155,7 @@ function removeNote(note) {
   this.notes = this.notes.filter((n) => n.id !== note.id)
   save(this.notes)
   if(this.notes.length > 0) {
-    this.selected = this.notes[index]
+    this.selectNote(this.notes[index])
   } else {
     this.selected = undefined
   }
@@ -156,8 +176,12 @@ function save(notes) {
 function loadNotes(vm) {
   chrome.storage.sync.get(SKEY, ({ [SKEY]: list = [] }) => {
     vm.notes.push(...list) // Push all notes to array with ES6 splat syntax
-    if(list.length) {
-      vm.selectNote(list[0])
+    if(vm.notes.length) {
+      chrome.storage.sync.get(SKEY_LAST, ({[SKEY_LAST]: id}) => {
+        vm.selected = vm.notes.find((item) => item.id === id)
+      })
+    } else {
+      vm.createNote()
     }
   })
 }
