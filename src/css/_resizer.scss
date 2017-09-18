@@ -1,0 +1,34 @@
+.notes {
+  --resizer-active: unquote('rgb(var(--accent))');
+  --resizer-bg: transparent;
+  --resizer-width: .5em;
+  --sidebar-timing: 300ms;
+  --sidebar-width: 30;
+  &.loading {
+    --sidebar-timing: 0ms;
+  }
+}
+.resizer {
+  position: relative;
+  z-index: 2;
+  flex: none;
+  width: var(--resizer-width);
+  margin: 0 calc((var(--resizer-width) * -1) / 2);
+  cursor: col-resize;
+  background: var(--resizer-bg);
+  transition: background 200ms linear;
+}
+.notes.is-resizing {
+  --resizer-bg: var(--resizer-active);
+  --sidebar-timing: 50ms;
+}
+.notes.is-zero {
+  .resizer:hover {
+    --resizer-bg: var(--resizer-active);
+  }
+}
+.sidebar {
+  width: calc(var(--sidebar-width) * 1vw);
+  min-width: 1em;
+  transition: width var(--sidebar-timing) ease-out;
+}

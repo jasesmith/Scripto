@@ -1,5 +1,5 @@
 <template>
-  <body class="notes">
+  <body class="notes" :class="{loading: isLoading}">
     <svg style="display: none">
       <symbol viewBox="0 0 34 34" id="x">
           <path d="M9.45752767,10.4003367 L10.4003367,9.45752767 C10.790861,9.06700338 11.424026,9.06700338 11.8145503,9.45752767 L17,14.6429774 L22.1854497,9.45752767 C22.575974,9.06700338 23.209139,9.06700338 23.5996633,9.45752767 L24.5424723,10.4003367 C24.9329966,10.790861 24.9329966,11.424026 24.5424723,11.8145503 L19.3570226,17 L24.5424723,22.1854497 C24.9329966,22.575974 24.9329966,23.209139 24.5424723,23.5996633 L23.5996633,24.5424723 C23.209139,24.9329966 22.575974,24.9329966 22.1854497,24.5424723 L17,19.3570226 L11.8145503,24.5424723 C11.424026,24.9329966 10.790861,24.9329966 10.4003367,24.5424723 L9.45752767,23.5996633 C9.06700338,23.209139 9.06700338,22.575974 9.45752767,22.1854497 L14.6429774,17 L9.45752767,11.8145503 C9.06700338,11.424026 9.06700338,10.790861 9.45752767,10.4003367 Z" id="+"></path>
@@ -33,7 +33,7 @@
         </small>
       </footer> -->
     </aside>
-
+    <div class="resizer"></div>
     <main class="main">
       <header>
         <input v-if="selected" v-model="selected.title" :key="selected.id" type="text" placeholder="Title..." class="note-title" />
@@ -59,7 +59,12 @@ import moment from 'moment'
 const { chrome } = window
 const SKEY = "SCRIPTO"
 const SKEY_LAST = `${SKEY}_LAST`
+const SKEY_WIDTH = `${SKEY}_WIDTH`
 const DIALOG_ID = "👻"
+const RESIZER_HOOK = '.resizer'
+const THRESHHOLD = 5
+const MAX = 65
+const SEED = 30
 
 const component = {
   data () {
@@ -67,8 +72,13 @@ const component = {
       notes: [],
       selected: undefined,
       showPreview: false,
+      isLoading: true,
       dialog: null,
+      resizer: null,
+      resizerParent: null,
       filter: '',
+      windX: 0,
+      lastX: SEED,
     }
   },
   computed: {
@@ -81,14 +91,56 @@ const component = {
       return (this.showPreview ? 'fa-compress':'fa-expand')
     },
   },
+  created () {
+    chrome.storage.sync.get(SKEY_WIDTH, ({[SKEY_WIDTH]: width}) => {
+      this.resizerParent.style.setProperty('--sidebar-width', width)
+    })
+  },
   mounted () {
     const vm = this
     this.dialog = document.getElementById(DIALOG_ID)
+    this.resizer = window.document.querySelector(RESIZER_HOOK)
+    this.resizerParent = this.resizer.parentNode
+    this.windX = window.document.body.clientWidth
+
     loadNotes(this)
+    chrome.storage.sync.get(SKEY_LAST, ({[SKEY_LAST]: id}) => {
+      this.selected = this.notes.find((item) => item.id === id)
+      this.isLoading = false
+    })
+
+    this.resizer.addEventListener('mousedown', (event) => {
+      if (event.which === 1) {
+        this.lastX = this.percentThis(event.pageX, this.windX)
+        window.addEventListener('mousemove', this.resizeElement)
+        event.preventDefault()
+      }
+    })
+
+    window.addEventListener('mouseup', (event) => {
+      // window.removeEventListener('mousemove', this.resizeElement)
+      chrome.storage.sync.set({[SKEY_WIDTH]: parseFloat(this.lastX.toFixed(1))})
+    })
+
+    this.resizer.addEventListener('dblclick', (event) => {
+      let width = this.resizerParent.style.getPropertyValue('--sidebar-width')
+      if(width) {
+        this.resizerParent.style.removeProperty('--sidebar-width')
+        this.resizerParent.classList.remove('is-zero')
+        chrome.storage.sync.remove(SKEY_WIDTH)
+      } else {
+        this.resizerParent.style.setProperty('--sidebar-width', 0)
+        this.resizerParent.classList.add('is-zero')
+        chrome.storage.sync.set({[SKEY_WIDTH]: 0})
+      }
+    })
+
+    window.addEventListener('resize', () => this.windX = window.document.body.clientWidth)
+
     vm.$watch(function() {
       if (!this.selected) return undefined;
       return { id: this.selected.id, lastEdit: this.selected.lastEdit, title: this.selected.title, body: this.selected.body };
-    }, function(val, prev) {
+     }, function(val, prev) {
       if (!prev) return;
       if (val.id === prev.id && (val.title !== prev.title || val.body !== prev.body)) {
         const ind = vm.notes.findIndex((x) => x.id === val.id);
@@ -100,11 +152,14 @@ const component = {
         }
         save(vm.notes);
       }
-    }, {
+     }, {
       deep: true
     });
   },
   methods: {
+    percentThis,
+    isPressed,
+    resizeElement,
     createNote,
     removeNote,
     tryDelete,
@@ -119,6 +174,29 @@ const component = {
 }
 
 export default component
+
+function percentThis(a, b) {
+  return parseFloat(((a/b)*100).toFixed(1))
+}
+
+function isPressed(event) {
+  return (event.buttons === null ? event.which !== 0 : event.buttons !== 0)
+}
+
+function resizeElement(event) {
+  if (!isPressed(event)) {
+    this.resizerParent.classList.remove('is-resizing')
+    window.removeEventListener('mousemove', this.resizeElement)
+  } else {
+    if(Math.abs(event.pageX - this.lastX) >= THRESHHOLD) {
+      this.resizerParent.classList.add('is-resizing')
+      let vw = 100 - percentThis(event.pageX, this.windX)
+      vw = vw >= MAX ? MAX : (vw < 0 ? 0 : vw)
+      this.resizerParent.style.setProperty('--sidebar-width', vw)
+      this.lastX = vw
+    }
+  }
+}
 
 function selectNote(note) {
   if (note === this.selected) {
@@ -175,11 +253,8 @@ function save(notes) {
 
 function loadNotes(vm) {
   chrome.storage.sync.get(SKEY, ({ [SKEY]: list = [] }) => {
-    vm.notes.push(...list) // Push all notes to array with ES6 splat syntax
-    if(vm.notes.length) {
-      chrome.storage.sync.get(SKEY_LAST, ({[SKEY_LAST]: id}) => {
-        vm.selected = vm.notes.find((item) => item.id === id)
-      })
+    if(list.length) {
+      vm.notes.push(...list) // Push all notes to array with ES6 splat syntax
     } else {
       vm.createNote()
     }

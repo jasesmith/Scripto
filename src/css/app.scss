@@ -1,6 +1,7 @@
 $fa-font-path: "~font-awesome/fonts";
 @import '~font-awesome/scss/font-awesome.scss';
 @import 'dialog';
+@import 'resizer';
 
 * {
   box-sizing: border-box;
@@ -10,6 +11,7 @@ $fa-font-path: "~font-awesome/fonts";
   --accent: 20, 200, 220; // rgb(20, 200, 220)
   --ok: 140, 200, 80; // rgb(140, 200, 80)
   --alert: 255, 60, 130; // rgb(255, 60, 130)
+
   height: 100vh;
   min-height: 36em;
   min-width: 48em;
@@ -44,7 +46,6 @@ aside {
   position: relative;
   z-index: 2;
   flex: none;
-  width: 18em;
   display: flex;
   flex-direction: column;
   color: #fff;
@@ -144,6 +145,9 @@ aside {
   .note-preview {
     opacity: .7;
     font-size: .6em;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
     // display: -webkit-box;
     // -webkit-line-clamp: 3;
     // -webkit-box-orient: vertical;
@@ -269,9 +273,11 @@ input.note-filter {
     display: flex;
     align-items: baseline;
     .todo-icon {
+      flex: none;
       margin-left: -1.5em;
       + * {
-        margin-left: .5em;
+        flex: 1;
+        margin-left: .25em;
       }
     }
     .todo-undone {
@@ -306,6 +312,10 @@ input.note-filter {
   from {opacity: 0;}
   to {opacity: 1;}
 }
+@keyframes editor-toolbar {
+  from {max-height: 0;padding: 0;}
+  to {max-height: 3em;padding: .5em 0;}
+}
 
 .editor-toolbar {
   position: relative;
@@ -319,14 +329,16 @@ input.note-filter {
   opacity: 1;
   display: flex;
   align-items: center;
-  transition: 325ms ease-out;
-  padding: .5em 0;
   max-height: 3em;
+  padding: .5em 0;
+  transition: 300ms ease-out 80ms;
+  // animation: editor-toolbar 325ms ease-out forwards 80ms;
   &::before,
   &::after {
     display: none;
   }
   &.disabled-for-preview {
+    // animation-direction: reverse;
     max-height: 0;
     padding: 0;
   }
@@ -350,7 +362,7 @@ input.note-filter {
     border: 0;
     line-height: 1;
     opacity: 1;
-    trasition: opacity 200ms ease-out;
+    transition: opacity 200ms ease-out;
     &.active {
       background: unquote('rgba(var(--base), .2)');
     }

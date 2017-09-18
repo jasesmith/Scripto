@@ -28,7 +28,7 @@
   }
 
   function initEditor(el, val) {
-    class MarkedCustomRenderer extends marked.Renderer {
+    class MarkedTaskListRenderer extends marked.Renderer {
       listitem(text) {
         if (/^\s*\[[dbsx\/\!\# ]\]\s*/.test(text)) {
           text = text
@@ -54,12 +54,12 @@
       },
       placeholder: "write all the things...",
       toolbar: ['bold', 'italic', 'strikethrough', 'heading', 'code', 'quote', 'unordered-list', 'ordered-list', 'link', 'image', 'horizontal-rule', 'preview'],
-      status: false, //["lines", "words", "cursor"],
+      status: false,
       autoDownloadFontAwesome: true,
       forceSync: true,
       previewRender: function(plainText, preview) { // Async method
-        var renderer = new MarkedCustomRenderer()
         setTimeout(function(){
+          var renderer = new MarkedTaskListRenderer()
           preview.innerHTML = marked(plainText, {renderer});
         }, 1);
       },
